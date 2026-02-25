@@ -4,7 +4,7 @@
 
 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; color: white; margin-bottom: 30px;">
 
-**📌 Version:** 1.0 | **📅 Released:** January 2024
+**📌 Version:** 1.0 | **📅 Released:** February 2026
 
 ```
 🔗 API Endpoint:  https://connect.othoba.com/api/azan-wholesale
