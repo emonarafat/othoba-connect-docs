@@ -1,4 +1,4 @@
-# 🚀 Azan Wholesale API
+# 🚀 API Azan Wholesale 
 
 > **Professional Technical Reference for Product & Inventory Synchronization**
 
@@ -18,11 +18,10 @@
 
 ## 📋 Quick Overview
 
-The **Azan Wholesale API** provides a modern, secure REST interface for real-time synchronization of:
+The **API for Azan Wholesale** provides a modern, secure REST interface for real-time synchronization of:
 
 - ✅ **Product Information** - Names, pricing, supplier details
 - ✅ **Inventory Levels** - Stock quantities, availability
-- ✅ **Batch Operations** - Efficient bulk updates
 - ✅ **Error Reporting** - Detailed validation feedback
 
 ### Key Highlights
