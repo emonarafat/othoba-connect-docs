@@ -11,7 +11,7 @@
 🔒 Protocol:      REST (HTTPS/TLS 1.2+)
 📦 Format:        JSON (application/json)
 🔑 Auth:          API Key (X-API-Key Header)
-⚡ Framework:     ASP.NET Core 6 (.NET 6)
+⚡ Framework:     ASP.NET Core
 ```
 
 </div>
