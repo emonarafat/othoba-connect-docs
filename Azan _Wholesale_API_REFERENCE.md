@@ -35,7 +35,7 @@ The **API for Azan Wholesale** provides a modern, secure REST interface for real
 | **Security** | API Key + HTTPS/TLS 1.2+ |
 | **Validation** | Comprehensive input validation |
 | **Reliability** | Exponential backoff support |
-| **Rate Limit** | 10,000 requests/hour |
+| **Rate Limit** | 1,000 requests/hour |
 
 ---
 
