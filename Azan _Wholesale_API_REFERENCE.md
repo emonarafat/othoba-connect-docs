@@ -4,14 +4,16 @@
 
 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; color: white; margin-bottom: 30px;">
 
-**📌 Version:** 1.0 | **📅 Released:** February 2026
+**📌 Version:** 1.1 | **📅 Released:** February 2026 | **Updated:** January 2024
+
 
 ```
 🔗 API Endpoint:  https://connect.othoba.com/api/azan-wholesale
 🔒 Protocol:      REST (HTTPS/TLS 1.2+)
 📦 Format:        JSON (application/json)
-🔑 Auth:          API Key (X-API-Key Header)
-⚡ Framework:     ASP.NET Core
+🔑 Auth:          API Key (X-API-Key or Secret-Key Header)
+⚡ Framework:     ASP.NET Core 6
+
 ```
 
 </div>
@@ -53,10 +55,17 @@ The **API for Azan Wholesale** provides a modern, secure REST interface for real
 
 ### 🔑 API Key Authentication
 
-> All requests require authentication via API Key transmitted in the HTTP request header.
+> All requests require authentication via API Key transmitted in the HTTP request header. **Supports both `X-API-Key` and `Secret-Key` headers.**
+
 
 ```
 X-API-Key: {api-key}
+```
+
+or
+
+```
+Secret-Key: {api-key}
 ```
 
 **Authentication Specifications:**
@@ -64,32 +73,52 @@ X-API-Key: {api-key}
 | 🎯 Requirement | 📋 Specification |
 |---|---|
 | 🔒 **Protocol** | **HTTPS/TLS 1.2+** (mandatory) |
-| 📝 **Header Name** | `X-API-Key` (case-insensitive) |
+| 📝 **Header Names** | `X-API-Key` **or** `Secret-Key` (case-insensitive) |
 | 🔑 **Key Format** | Alphanumeric string (provided by Othoba) |
 | 📤 **Transmission** | HTTP Header only (never in URL/body) |
 | ✅ **Validation** | Performed on every single request |
+| 🔄 **Fallback** | Checks `X-API-Key` first, then `Secret-Key` if not found |
 
 ### ❌ Without Authentication (Missing API Key)
 
-```http
+
+```
 POST /api/azan-wholesale/update-product HTTP/1.1
 Host: connect.othoba.com
 Content-Type: application/json
 
 { "product_id": "123", ... }
+
 ```
 
 **Response:** `❌ 401 Unauthorized`
 
-### ✅ With Authentication (Correct API Key)
+### ✅ With Authentication (Using X-API-Key)
 
-```http
+
+```
 POST /api/azan-wholesale/update-product HTTP/1.1
 Host: connect.othoba.com
 Content-Type: application/json
 X-API-Key: sk_live_abc123def456ghi789jkl
 
 { "product_id": "123", ... }
+
+```
+
+**Response:** `✅ 204 No Content`
+
+### ✅ Alternative Authentication (Using Secret-Key)
+
+
+```
+POST /api/azan-wholesale/update-product HTTP/1.1
+Host: connect.othoba.com
+Content-Type: application/json
+Secret-Key: sk_live_abc123def456ghi789jkl
+
+{ "product_id": "123", ... }
+
 ```
 
 **Response:** `✅ 204 No Content`
@@ -106,8 +135,10 @@ X-API-Key: sk_live_abc123def456ghi789jkl
 | 🚨 **Revocation** | Immediately revoke compromised keys |
 
 **Environment Variable Example:**
-```bash
+
+```sh
 export AZAN_API_KEY="sk_live_your_actual_key_here"
+
 ```
 
 ---
@@ -119,6 +150,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
 > **Purpose:** Synchronize product details to the Othoba platform in real-time.
 
 **JSON Schema:**
+
 ```json
 {
   "type": "object",
@@ -132,6 +164,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   },
   "required": ["product_id", "supplier", "name", "sku", "mrp_price", "wholesale_price"]
 }
+
 ```
 
 **Field Reference:**
@@ -146,6 +179,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
 | `wholesale_price` | Decimal | ✓ | ≥ 0, max 2 decimals | Wholesale/cost price |
 
 **Example Payload:**
+
 ```json
 {
   "product_id": "123",
@@ -155,6 +189,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   "mrp_price": 89999.99,
   "wholesale_price": 75000.00
 }
+
 ```
 
 **Validation Rules:**
@@ -171,6 +206,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
 > **Purpose:** Update inventory/stock levels for existing products in real-time.
 
 **JSON Schema:**
+
 ```json
 {
   "type": "object",
@@ -182,6 +218,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   },
   "required": ["product_id", "sku", "supplier", "stock"]
 }
+
 ```
 
 **Field Reference:**
@@ -194,6 +231,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
 | `stock` | Integer | ✓ | ≥ 0, ≤ 2,147,483,647 | Available quantity (units) |
 
 **Example Payload:**
+
 ```json
 {
   "product_id": "123",
@@ -201,6 +239,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   "supplier": "Azan Wholesale",
   "stock": 150
 }
+
 ```
 
 **Validation Rules:**
@@ -220,17 +259,20 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
 
 **Endpoint Specifications:**
 
+
 ```
 🔗 Method:           POST
 📂 Path:             /update-product
 🌐 Full URL:         https://connect.othoba.com/api/azan-wholesale/update-product
 📋 Content-Type:     application/json
-🔑 Auth Required:    X-API-Key header
+🔑 Auth Required:    X-API-Key or Secret-Key header
 ⏱️ Timeout:          30 seconds
+
 ```
 
 **Request Example:**
-```http
+
+```
 POST /api/azan-wholesale/update-product HTTP/1.1
 Host: connect.othoba.com
 Content-Type: application/json
@@ -244,18 +286,22 @@ X-API-Key: your-api-key-here
   "mrp_price": 89999.99,
   "wholesale_price": 75000.00
 }
+
 ```
 
 **✅ Success Response (204 No Content):**
-```http
+
+```
 HTTP/1.1 204 No Content
 Date: Wed, 15 Jan 2024 10:30:45 GMT
 Server: Kestrel
 Content-Length: 0
+
 ```
 
 **❌ Validation Error (400 Bad Request):**
-```http
+
+```
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
@@ -265,26 +311,31 @@ Content-Type: application/json
     "mrp_price": ["mrp_price cannot be negative"]
   }
 }
+
 ```
 
 **🔐 Auth Error (401 Unauthorized):**
-```http
+
+```
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
 
 {
   "error": "Invalid or missing API key"
 }
+
 ```
 
 **⚠️ Server Error (500 Internal Server Error):**
-```http
+
+```
 HTTP/1.1 500 Internal Server Error
 Content-Type: application/json
 
 {
   "error": "An unexpected error occurred while processing the request"
 }
+
 ```
 
 **Response Status Reference:**
@@ -304,17 +355,20 @@ Content-Type: application/json
 
 **Endpoint Specifications:**
 
+
 ```
 🔗 Method:           POST
 📂 Path:             /update-stock
 🌐 Full URL:         https://connect.othoba.com/api/azan-wholesale/update-stock
 📋 Content-Type:     application/json
-🔑 Auth Required:    X-API-Key header
+🔑 Auth Required:    X-API-Key or Secret-Key header
 ⏱️ Timeout:          30 seconds
+
 ```
 
 **Request Example:**
-```http
+
+```
 POST /api/azan-wholesale/update-stock HTTP/1.1
 Host: connect.othoba.com
 Content-Type: application/json
@@ -326,18 +380,22 @@ X-API-Key: your-api-key-here
   "supplier": "Azan Wholesale",
   "stock": 150
 }
+
 ```
 
 **✅ Success Response (204 No Content):**
-```http
+
+```
 HTTP/1.1 204 No Content
 Date: Wed, 15 Jan 2024 10:30:47 GMT
 Server: Kestrel
 Content-Length: 0
+
 ```
 
 **❌ Validation Error (400 Bad Request):**
-```http
+
+```
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
@@ -346,6 +404,7 @@ Content-Type: application/json
     "stock": ["stock cannot be negative"]
   }
 }
+
 ```
 
 **Response Status Reference:**
@@ -373,6 +432,7 @@ Content-Type: application/json
 ### 📋 Error Response Structures
 
 **Validation Errors (400):**
+
 ```json
 {
   "errors": {
@@ -382,20 +442,25 @@ Content-Type: application/json
     ]
   }
 }
+
 ```
 
 **Authentication Errors (401):**
+
 ```json
 {
   "error": "Invalid or missing API key"
 }
+
 ```
 
 **Server Errors (500):**
+
 ```json
 {
   "error": "An unexpected error occurred while processing the request"
 }
+
 ```
 
 ### 💡 Response Handling Guide
@@ -404,7 +469,7 @@ Content-Type: application/json
 |---|---|---|
 | 📤 Request succeeded | `204` | ✅ Success - proceed normally |
 | 🔍 Invalid data sent | `400` | ❌ Fix data, check error details, retry |
-| 🔑 Auth failed | `401` | ❌ Verify API key is correct |
+| 🔑 Auth failed | `401` | ❌ Verify API key is correct and header name (supports X-API-Key or Secret-Key) |
 | ⚠️ Server error | `500` | ⏳ Implement exponential backoff & retry |
 
 ---
@@ -414,6 +479,7 @@ Content-Type: application/json
 ### 🐘 PHP Implementation
 
 **Basic Client:**
+
 ```php
 <?php
 /**
@@ -425,12 +491,14 @@ class AzanWholesaleAPI {
     private $apiKey;
     private $baseUrl = 'https://connect.othoba.com/api/azan-wholesale';
     private $timeout = 30;
+    private $headerName = 'X-API-Key'; // Can also use 'Secret-Key'
 
-    public function __construct($apiKey) {
+    public function __construct($apiKey, $headerName = 'X-API-Key') {
         if (empty($apiKey)) {
             throw new InvalidArgumentException('API key cannot be empty');
         }
         $this->apiKey = $apiKey;
+        $this->headerName = $headerName; // 'X-API-Key' or 'Secret-Key'
     }
 
     /**
@@ -476,7 +544,7 @@ class AzanWholesaleAPI {
             CURLOPT_POSTFIELDS => json_encode($data),
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'X-API-Key: ' . $this->apiKey
+                $this->headerName . ': ' . $this->apiKey
             ],
             CURLOPT_TIMEOUT => $this->timeout,
             CURLOPT_SSL_VERIFYPEER => true,
@@ -501,108 +569,16 @@ class AzanWholesaleAPI {
     }
 }
 
-// Usage Example
-$api = new AzanWholesaleAPI($_ENV['AZAN_API_KEY']);
+// Usage Example with X-API-Key
+$api = new AzanWholesaleAPI($_ENV['AZAN_API_KEY'], 'X-API-Key');
 $result = $api->updateProduct('123', 'Azan', 'Samsung TV', 'TV-001', 89999.99, 75000.00);
 echo $result['success'] ? 'Success!' : 'Error: ' . json_encode($result['data']);
+
+// Or use Secret-Key header
+$api = new AzanWholesaleAPI($_ENV['AZAN_API_KEY'], 'Secret-Key');
+$result = $api->updateProduct('123', 'Azan', 'Samsung TV', 'TV-001', 89999.99, 75000.00);
 ?>
-```
 
-**Advanced Client with Batch Processing:**
-```php
-<?php
-class AzanWholesaleAPIAdvanced {
-    private $apiKey;
-    private $baseUrl = 'https://connect.othoba.com/api/azan-wholesale';
-    private $timeout = 30;
-    private $maxRetries = 3;
-
-    public function __construct($apiKey) {
-        $this->apiKey = $apiKey;
-    }
-
-    /**
-     * Batch update products with retry logic
-     */
-    public function batchUpdateProducts(array $products) {
-        $results = ['successful' => 0, 'failed' => 0, 'items' => []];
-
-        foreach ($products as $product) {
-            $result = $this->updateProductWithRetry(
-                $product['product_id'],
-                $product['supplier'],
-                $product['name'],
-                $product['sku'],
-                $product['mrp_price'],
-                $product['wholesale_price']
-            );
-
-            if ($result['success']) {
-                $results['successful']++;
-            } else {
-                $results['failed']++;
-            }
-
-            $results['items'][] = [
-                'product_id' => $product['product_id'],
-                'status' => $result['success'] ? 'SUCCESS' : 'FAILED'
-            ];
-
-            usleep(100000); // Rate limiting
-        }
-
-        return $results;
-    }
-
-    /**
-     * Update with exponential backoff retry
-     */
-    private function updateProductWithRetry($productId, $supplier, $name, $sku, $mrpPrice, $wholesalePrice, $attempt = 1) {
-        $payload = [
-            'product_id' => (string)$productId,
-            'supplier' => (string)$supplier,
-            'name' => (string)$name,
-            'sku' => (string)$sku,
-            'mrp_price' => (float)$mrpPrice,
-            'wholesale_price' => (float)$wholesalePrice
-        ];
-
-        $result = $this->makeRequest('/update-product', $payload);
-
-        // Retry on 500 errors with exponential backoff
-        if (!$result['success'] && $result['http_code'] === 500 && $attempt < $this->maxRetries) {
-            $waitTime = pow(2, $attempt - 1);
-            sleep($waitTime);
-            return $this->updateProductWithRetry($productId, $supplier, $name, $sku, $mrpPrice, $wholesalePrice, $attempt + 1);
-        }
-
-        return $result;
-    }
-
-    private function makeRequest($endpoint, $data) {
-        $url = $this->baseUrl . $endpoint;
-        $ch = curl_init($url);
-
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'X-API-Key: ' . $this->apiKey],
-            CURLOPT_TIMEOUT => $this->timeout,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        return $httpCode === 204
-            ? ['success' => true, 'http_code' => 204]
-            : ['success' => false, 'data' => json_decode($response, true), 'http_code' => $httpCode];
-    }
-}
-?>
 ```
 
 ---
@@ -610,6 +586,7 @@ class AzanWholesaleAPIAdvanced {
 ### 🐍 Python Implementation
 
 **Basic Client:**
+
 ```python
 import requests
 import json
@@ -618,10 +595,12 @@ from typing import Dict, Any
 class AzanWholesaleAPI:
     """Azan Wholesale API Client"""
 
-    def __init__(self, api_key: str, base_url: str = "https://connect.othoba.com/api/azan-wholesale"):
+    def __init__(self, api_key: str, header_name: str = "X-API-Key", 
+                 base_url: str = "https://connect.othoba.com/api/azan-wholesale"):
         if not api_key:
             raise ValueError("API key cannot be empty")
         self.api_key = api_key
+        self.header_name = header_name  # 'X-API-Key' or 'Secret-Key'
         self.base_url = base_url
         self.timeout = 30
 
@@ -651,7 +630,10 @@ class AzanWholesaleAPI:
     def _make_request(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Make HTTP request"""
         url = f"{self.base_url}{endpoint}"
-        headers = {"Content-Type": "application/json", "X-API-Key": self.api_key}
+        headers = {
+            "Content-Type": "application/json",
+            self.header_name: self.api_key
+        }
 
         try:
             response = requests.post(url, headers=headers, json=payload, timeout=self.timeout)
@@ -661,98 +643,15 @@ class AzanWholesaleAPI:
         except requests.RequestException as e:
             return {"success": False, "error": str(e)}
 
-# Usage
-api = AzanWholesaleAPI(api_key="your-api-key")
+# Usage with X-API-Key
+api = AzanWholesaleAPI(api_key="your-api-key", header_name="X-API-Key")
 result = api.update_product("123", "Azan", "Samsung TV", "TV-001", 89999.99, 75000.00)
 print("Success!" if result['success'] else f"Error: {result}")
-```
 
-**Advanced Client with Batch Processing:**
-```python
-import requests
-import json
-import time
-import logging
-from typing import Dict, Any, List
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+# Or use Secret-Key header
+api = AzanWholesaleAPI(api_key="your-api-key", header_name="Secret-Key")
+result = api.update_product("123", "Azan", "Samsung TV", "TV-001", 89999.99, 75000.00)
 
-class AzanWholesaleAPIAdvanced:
-    """Advanced Azan Wholesale API Client with retry logic"""
-
-    def __init__(self, api_key: str, base_url: str = "https://connect.othoba.com/api/azan-wholesale"):
-        self.api_key = api_key
-        self.base_url = base_url
-        self.timeout = 30
-        self.logger = logging.getLogger(__name__)
-        self.session = self._create_session()
-
-    def _create_session(self) -> requests.Session:
-        """Create session with retry strategy"""
-        session = requests.Session()
-        retry_strategy = Retry(total=3, status_forcelist=[500, 502, 503], backoff_factor=1)
-        adapter = HTTPAdapter(max_retries=retry_strategy)
-        session.mount("https://", adapter)
-        return session
-
-    def batch_update_products(self, products: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Batch update products with rate limiting"""
-        results = {"successful": 0, "failed": 0, "items": []}
-
-        for i, product in enumerate(products):
-            result = self.update_product(
-                product['product_id'], product['supplier'], product['name'],
-                product['sku'], product['mrp_price'], product['wholesale_price']
-            )
-
-            if result['success']:
-                results['successful'] += 1
-            else:
-                results['failed'] += 1
-
-            results['items'].append({'product_id': product['product_id'], 'status': 'SUCCESS' if result['success'] else 'FAILED'})
-            time.sleep(0.1)  # Rate limiting
-
-        return results
-
-    def update_product(self, product_id: str, supplier: str, name: str, sku: str,
-                      mrp_price: float, wholesale_price: float) -> Dict[str, Any]:
-        """Update product with validation"""
-        if not all([product_id, supplier, name, sku]):
-            return {"success": False, "error": "Missing required fields"}
-
-        payload = {
-            "product_id": str(product_id),
-            "supplier": supplier,
-            "name": name,
-            "sku": sku,
-            "mrp_price": mrp_price,
-            "wholesale_price": wholesale_price
-        }
-        return self._make_request('/update-product', payload)
-
-    def _make_request(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Make HTTP request with error handling"""
-        url = f"{self.base_url}{endpoint}"
-        headers = {"Content-Type": "application/json", "X-API-Key": self.api_key}
-
-        try:
-            response = self.session.post(url, headers=headers, json=payload, timeout=self.timeout)
-            if response.status_code == 204:
-                return {"success": True}
-            return {"success": False, "errors": response.json(), "http_code": response.status_code}
-        except requests.RequestException as e:
-            self.logger.error(f"Request error: {str(e)}")
-            return {"success": False, "error": str(e)}
-
-# Usage
-api = AzanWholesaleAPIAdvanced(api_key="your-api-key")
-products = [
-    {"product_id": "123", "supplier": "Azan", "name": "TV", "sku": "TV-001", "mrp_price": 89999.99, "wholesale_price": 75000.00},
-    {"product_id": "124", "supplier": "Azan", "name": "Phone", "sku": "PH-001", "mrp_price": 49999.99, "wholesale_price": 40000.00}
-]
-results = api.batch_update_products(products)
-print(json.dumps(results, indent=2))
 ```
 
 ---
@@ -762,34 +661,43 @@ print(json.dumps(results, indent=2))
 ### Common Error Scenarios
 
 **Scenario 1️⃣ : Invalid Product ID**
+
 ```json
 Request:  { "product_id": "999", ... }
 Response: { "errors": { "product_id": ["product_id must exist in system"] } }
 Status:   400 Bad Request
+
 ```
 
 **Scenario 2️⃣ : Negative Price**
+
 ```json
 Request:  { "mrp_price": -100, ... }
 Response: { "errors": { "mrp_price": ["mrp_price cannot be negative"] } }
 Status:   400 Bad Request
+
 ```
 
 **Scenario 3️⃣ : Missing API Key**
+
 ```
-Request:  (no X-API-Key header)
+Request:  (no X-API-Key or Secret-Key header)
 Response: { "error": "Invalid or missing API key" }
 Status:   401 Unauthorized
+
 ```
 
 **Scenario 4️⃣ : Server Error**
+
 ```json
 Response: { "error": "An unexpected error occurred while processing the request" }
 Status:   500 Internal Server Error
 Action:   Retry with exponential backoff (1s, 2s, 4s)
+
 ```
 
 ### 🛠️ Client-Side Error Handling Best Practices
+
 
 ```javascript
 // Pseudo-code pattern
@@ -800,12 +708,13 @@ if (response.status === 204) {
   // ⚠️ Validation error - don't retry
   console.error('Invalid data:', response.errors);
 } else if (response.status === 401) {
-  // 🔐 Auth error - check API key
-  console.error('Invalid API key');
+  // 🔐 Auth error - check API key and header name
+  console.error('Invalid API key or header. Supported headers: X-API-Key, Secret-Key');
 } else if (response.status === 500) {
   // 🔴 Server error - retry with backoff
   retryWithExponentialBackoff();
 }
+
 ```
 
 ---
@@ -837,6 +746,7 @@ if (response.status === 204) {
 - Implement exponential backoff for retries
 - Cache responses where appropriate
 - Monitor API usage patterns
+- Support both X-API-Key and Secret-Key headers in client implementations
 
 ❌ **Don't:**
 - Make synchronous sequential calls
@@ -848,16 +758,12 @@ if (response.status === 204) {
 
 ## 📞 Support & Contact
 
-<div style="background: #f0f4ff; border-left: 4px solid #667eea; padding: 20px; border-radius: 4px; margin-bottom: 20px;">
-
 ### 🆘 Get Help
 
 | 📱 Channel | 🔗 Contact | ⏱️ Hours |
 |---|---|---|
 | 📧 **Email** | support@othoba.com | 24/7 Support |
 | 💬 **Documentation** | See this guide | Always available |
-
-</div>
 
 ### 📚 Additional Resources
 
@@ -902,13 +808,19 @@ A: Yes, implement client-side batching with 100-200ms delays between requests.
 **Q: What happens if I exceed the rate limit?**  
 A: Requests will be rejected. Implement exponential backoff retry strategy.
 
+**Q: Which header should I use for API key - X-API-Key or Secret-Key?**  
+A: Both are supported! The API checks `X-API-Key` first, then falls back to `Secret-Key` if not found. Use whichever is more appropriate for your integration.
+
+**Q: Do I need to change my implementation if I want to switch between header names?**  
+A: No, both headers are always supported simultaneously. You can use either one, or even migrate from one to the other without service disruption.
+
 ---
 
 ## 📄 Document Information
 
 | 🏷️ Property | 📝 Value |
 |---|---|
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Last Updated** | January 2024 |
 | **Status** | Production Ready |
 | **Framework** | ASP.NET Core 6 |
