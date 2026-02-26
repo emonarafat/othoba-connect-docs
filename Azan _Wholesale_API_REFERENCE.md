@@ -1,19 +1,19 @@
-# 🚀 API Azan Wholesale 
+# 🚀 API Azan Wholesale - Product & Stock Synchronization
 
-> **Professional Technical Reference for Product & Inventory Synchronization**
+> **Production-Ready Technical Reference for EuroAsia Wholesale Integration**
 
 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px; color: white; margin-bottom: 30px;">
 
-**📌 Version:** 1.1 | **📅 Released:** February 2026 | **Updated:** January 2024
-
+**📌 Version:** 2.1 | **📅 Released:** February 2026 | **Updated:** January 2024 | **Status:** ✅ Production Ready
 
 ```
 🔗 API Endpoint:  https://connect.othoba.com/api/azan-wholesale
 🔒 Protocol:      REST (HTTPS/TLS 1.2+)
 📦 Format:        JSON (application/json)
 🔑 Auth:          API Key (X-API-Key or Secret-Key Header)
-⚡ Framework:     ASP.NET Core 6
-
+⚡ Framework:     ASP.NET Core 6 (.NET 6)
+🎯 Response:      Typed ApiResponse + RFC 7807 ProblemDetails
+🔧 Status Codes:  200 (Success), 400 (Validation), 401 (Auth), 500 (Error)
 ```
 
 </div>
@@ -24,7 +24,7 @@ The **API for Azan Wholesale** provides a modern, secure REST interface for real
 
 - ✅ **Product Information** - Names, pricing, supplier details
 - ✅ **Inventory Levels** - Stock quantities, availability
-- ✅ **Error Reporting** - Detailed validation feedback
+- ✅ **Error Reporting** - Detailed validation feedback with structured error responses
 
 ### Key Highlights
 
@@ -36,6 +36,7 @@ The **API for Azan Wholesale** provides a modern, secure REST interface for real
 | **Validation** | Comprehensive input validation |
 | **Reliability** | Exponential backoff support |
 | **Rate Limit** | 1,000 requests/hour |
+| **Response Format** | Strongly-typed responses with ProblemDetails |
 
 ---
 
@@ -43,6 +44,7 @@ The **API for Azan Wholesale** provides a modern, secure REST interface for real
 
 - [🔐 Authentication & Security](#-authentication--security)
 - [📦 API Models & Schemas](#-api-models--schemas)
+- [📤 Response Formats](#-response-formats)
 - [🔌 Endpoints Reference](#-endpoints-reference)
 - [⚙️ HTTP Status Codes](#-http-status-codes)
 - [💻 Implementation Examples](#-implementation-examples)
@@ -56,7 +58,6 @@ The **API for Azan Wholesale** provides a modern, secure REST interface for real
 ### 🔑 API Key Authentication
 
 > All requests require authentication via API Key transmitted in the HTTP request header. **Supports both `X-API-Key` and `Secret-Key` headers.**
-
 
 ```
 X-API-Key: {api-key}
@@ -79,50 +80,6 @@ Secret-Key: {api-key}
 | ✅ **Validation** | Performed on every single request |
 | 🔄 **Fallback** | Checks `X-API-Key` first, then `Secret-Key` if not found |
 
-### ❌ Without Authentication (Missing API Key)
-
-
-```
-POST /api/azan-wholesale/update-product HTTP/1.1
-Host: connect.othoba.com
-Content-Type: application/json
-
-{ "product_id": "123", ... }
-
-```
-
-**Response:** `❌ 401 Unauthorized`
-
-### ✅ With Authentication (Using X-API-Key)
-
-
-```
-POST /api/azan-wholesale/update-product HTTP/1.1
-Host: connect.othoba.com
-Content-Type: application/json
-X-API-Key: sk_live_abc123def456ghi789jkl
-
-{ "product_id": "123", ... }
-
-```
-
-**Response:** `✅ 204 No Content`
-
-### ✅ Alternative Authentication (Using Secret-Key)
-
-
-```
-POST /api/azan-wholesale/update-product HTTP/1.1
-Host: connect.othoba.com
-Content-Type: application/json
-Secret-Key: sk_live_abc123def456ghi789jkl
-
-{ "product_id": "123", ... }
-
-```
-
-**Response:** `✅ 204 No Content`
-
 ### 🛡️ Security Best Practices
 
 | 🔐 Practice | 💡 Implementation |
@@ -133,13 +90,6 @@ Secret-Key: sk_live_abc123def456ghi789jkl
 | 🚫 **Access Control** | Restrict to specific IP ranges when possible |
 | 👁️ **Monitoring** | Alert on unusual patterns, repeated failures |
 | 🚨 **Revocation** | Immediately revoke compromised keys |
-
-**Environment Variable Example:**
-
-```sh
-export AZAN_API_KEY="sk_live_your_actual_key_here"
-
-```
 
 ---
 
@@ -164,7 +114,6 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   },
   "required": ["product_id", "supplier", "name", "sku", "mrp_price", "wholesale_price"]
 }
-
 ```
 
 **Field Reference:**
@@ -189,15 +138,7 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   "mrp_price": 89999.99,
   "wholesale_price": 75000.00
 }
-
 ```
-
-**Validation Rules:**
-- ✅ All fields mandatory; null values rejected
-- ✅ String fields must not be empty or whitespace-only
-- ✅ `product_id` must exist in Othoba system
-- ✅ Prices non-negative with max 2 decimal places
-- ✅ String length constraints enforced
 
 ---
 
@@ -218,7 +159,6 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   },
   "required": ["product_id", "sku", "supplier", "stock"]
 }
-
 ```
 
 **Field Reference:**
@@ -239,15 +179,164 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
   "supplier": "Azan Wholesale",
   "stock": 150
 }
-
 ```
 
-**Validation Rules:**
-- ✅ All fields mandatory
-- ✅ `stock` must be non-negative integer
-- ✅ `product_id` must match existing product
-- ✅ `sku` must match product's SKU in system
-- ✅ Stock value limited to 32-bit signed integer
+---
+
+## 📤 Response Formats
+
+### ✅ Success Response Format
+
+**HTTP 200 OK - Strongly Typed Response:**
+
+```json
+{
+  "success": true,
+  "message": "Product updated successfully",
+  "errors": null
+}
+```
+
+**Response Structure:**
+
+| 🏷️ Field | 📝 Type | 📖 Description |
+|---|---|---|
+| `success` | Boolean | Always `true` for successful requests |
+| `message` | String | Human-readable success message |
+| `errors` | Object \| Null | Always `null` for success responses |
+
+**Success Message Examples:**
+
+| 🎯 Endpoint | 📝 Message |
+|---|---|
+| POST `/update-product` | "Product updated successfully" |
+| POST `/update-stock` | "Stock updated successfully" |
+
+---
+
+### ❌ Validation Error Response Format (400 Bad Request)
+
+**RFC 7807 ProblemDetails with Typed Response:**
+
+```json
+{
+  "type": "https://connect.othoba.com/api/validation-error",
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "One or more validation errors occurred.",
+  "instance": "/api/azan-wholesale/update-product",
+  "response": {
+    "success": false,
+    "message": "One or more validation errors occurred.",
+    "errors": {
+      "product_id": [
+        "product_id is required"
+      ],
+      "mrp_price": [
+        "mrp_price cannot be negative"
+      ]
+    }
+  }
+}
+```
+
+**Response Structure:**
+
+| 🏷️ Field | 📝 Type | 📖 Description |
+|---|---|---|
+| `type` | String | Problem type URI |
+| `title` | String | Problem title ("Validation Error") |
+| `status` | Integer | HTTP status code (400) |
+| `detail` | String | Problem description |
+| `instance` | String | Request path that caused the error |
+| `response` | Object | Nested ApiResponse with error details |
+| `response.success` | Boolean | Always `false` for errors |
+| `response.message` | String | Error message |
+| `response.errors` | Object | Field-level validation errors |
+
+**Field-Level Errors:**
+
+```json
+{
+  "errors": {
+    "field_name": [
+      "Error message 1",
+      "Error message 2"
+    ]
+  }
+}
+```
+
+---
+
+### 🔐 Authentication Error Response Format (401 Unauthorized)
+
+**RFC 7807 ProblemDetails Format:**
+
+```json
+{
+  "type": "https://connect.othoba.com/api/validation-error",
+  "title": "Validation Error",
+  "status": 401,
+  "detail": "Invalid or missing API key",
+  "instance": "/api/azan-wholesale/update-product",
+  "response": {
+    "success": false,
+    "message": "Invalid or missing API key",
+    "errors": null
+  }
+}
+```
+
+**Common 401 Scenarios:**
+
+| 🎯 Scenario | 💬 Message |
+|---|---|
+| Missing header | "Invalid or missing API key" |
+| Invalid key | "Invalid or missing API key" |
+| Wrong header name | "Invalid or missing API key" |
+
+---
+
+### ⚠️ Operation Error Response Format (400 Bad Request)
+
+**RFC 7807 ProblemDetails for Business Logic Errors:**
+
+```json
+{
+  "type": "https://connect.othoba.com/api/operation-error",
+  "title": "Operation Error",
+  "status": 400,
+  "detail": "Product with this SKU already exists",
+  "instance": "/api/azan-wholesale/update-product",
+  "response": {
+    "success": false,
+    "message": "Product with this SKU already exists",
+    "errors": null
+  }
+}
+```
+
+---
+
+### 🔴 Server Error Response Format (500 Internal Server Error)
+
+**RFC 7807 ProblemDetails for Unexpected Errors:**
+
+```json
+{
+  "type": "https://connect.othoba.com/api/server-error",
+  "title": "Internal Server Error",
+  "status": 500,
+  "detail": "An unexpected error occurred while processing the request",
+  "instance": "/api/azan-wholesale/update-product",
+  "response": {
+    "success": false,
+    "message": "An unexpected error occurred while processing the request",
+    "errors": null
+  }
+}
+```
 
 ---
 
@@ -259,7 +348,6 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
 
 **Endpoint Specifications:**
 
-
 ```
 🔗 Method:           POST
 📂 Path:             /update-product
@@ -267,7 +355,6 @@ export AZAN_API_KEY="sk_live_your_actual_key_here"
 📋 Content-Type:     application/json
 🔑 Auth Required:    X-API-Key or Secret-Key header
 ⏱️ Timeout:          30 seconds
-
 ```
 
 **Request Example:**
@@ -286,17 +373,23 @@ X-API-Key: your-api-key-here
   "mrp_price": 89999.99,
   "wholesale_price": 75000.00
 }
-
 ```
 
-**✅ Success Response (204 No Content):**
+**✅ Success Response (200 OK):**
 
 ```
-HTTP/1.1 204 No Content
+HTTP/1.1 200 OK
 Date: Wed, 15 Jan 2024 10:30:45 GMT
 Server: Kestrel
-Content-Length: 0
+Content-Type: application/json
+```
 
+```json
+{
+  "success": true,
+  "message": "Product updated successfully",
+  "errors": null
+}
 ```
 
 **❌ Validation Error (400 Bad Request):**
@@ -304,14 +397,24 @@ Content-Length: 0
 ```
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
+```
 
+```json
 {
-  "errors": {
-    "product_id": ["product_id is required"],
-    "mrp_price": ["mrp_price cannot be negative"]
+  "type": "https://connect.othoba.com/api/validation-error",
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "One or more validation errors occurred.",
+  "instance": "/api/azan-wholesale/update-product",
+  "response": {
+    "success": false,
+    "message": "One or more validation errors occurred.",
+    "errors": {
+      "product_id": ["product_id is required"],
+      "mrp_price": ["mrp_price cannot be negative"]
+    }
   }
 }
-
 ```
 
 **🔐 Auth Error (401 Unauthorized):**
@@ -319,11 +422,21 @@ Content-Type: application/json
 ```
 HTTP/1.1 401 Unauthorized
 Content-Type: application/json
+```
 
+```json
 {
-  "error": "Invalid or missing API key"
+  "type": "https://connect.othoba.com/api/validation-error",
+  "title": "Validation Error",
+  "status": 401,
+  "detail": "Invalid or missing API key",
+  "instance": "/api/azan-wholesale/update-product",
+  "response": {
+    "success": false,
+    "message": "Invalid or missing API key",
+    "errors": null
+  }
 }
-
 ```
 
 **⚠️ Server Error (500 Internal Server Error):**
@@ -331,21 +444,22 @@ Content-Type: application/json
 ```
 HTTP/1.1 500 Internal Server Error
 Content-Type: application/json
-
-{
-  "error": "An unexpected error occurred while processing the request"
-}
-
 ```
 
-**Response Status Reference:**
-
-| 🎯 Code | 📌 Status | 💬 Meaning | 👉 Action |
-|---|---|---|---|
-| ✅ `204` | No Content | Successfully processed | No action needed |
-| ⚠️ `400` | Bad Request | Validation failed | Check error details & retry |
-| 🔐 `401` | Unauthorized | Auth failed | Verify API key |
-| 🔴 `500` | Server Error | Server error | Retry with exponential backoff |
+```json
+{
+  "type": "https://connect.othoba.com/api/server-error",
+  "title": "Internal Server Error",
+  "status": 500,
+  "detail": "An unexpected error occurred while processing the request",
+  "instance": "/api/azan-wholesale/update-product",
+  "response": {
+    "success": false,
+    "message": "An unexpected error occurred while processing the request",
+    "errors": null
+  }
+}
+```
 
 ---
 
@@ -355,7 +469,6 @@ Content-Type: application/json
 
 **Endpoint Specifications:**
 
-
 ```
 🔗 Method:           POST
 📂 Path:             /update-stock
@@ -363,7 +476,6 @@ Content-Type: application/json
 📋 Content-Type:     application/json
 🔑 Auth Required:    X-API-Key or Secret-Key header
 ⏱️ Timeout:          30 seconds
-
 ```
 
 **Request Example:**
@@ -380,17 +492,23 @@ X-API-Key: your-api-key-here
   "supplier": "Azan Wholesale",
   "stock": 150
 }
-
 ```
 
-**✅ Success Response (204 No Content):**
+**✅ Success Response (200 OK):**
 
 ```
-HTTP/1.1 204 No Content
+HTTP/1.1 200 OK
 Date: Wed, 15 Jan 2024 10:30:47 GMT
 Server: Kestrel
-Content-Length: 0
+Content-Type: application/json
+```
 
+```json
+{
+  "success": true,
+  "message": "Stock updated successfully",
+  "errors": null
+}
 ```
 
 **❌ Validation Error (400 Bad Request):**
@@ -398,23 +516,24 @@ Content-Length: 0
 ```
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
-
-{
-  "errors": {
-    "stock": ["stock cannot be negative"]
-  }
-}
-
 ```
 
-**Response Status Reference:**
-
-| 🎯 Code | 📌 Status | 💬 Meaning | 👉 Action |
-|---|---|---|---|
-| ✅ `204` | No Content | Successfully processed | No action needed |
-| ⚠️ `400` | Bad Request | Validation failed | Check error details & retry |
-| 🔐 `401` | Unauthorized | Auth failed | Verify API key |
-| 🔴 `500` | Server Error | Server error | Retry with exponential backoff |
+```json
+{
+  "type": "https://connect.othoba.com/api/validation-error",
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "One or more validation errors occurred.",
+  "instance": "/api/azan-wholesale/update-stock",
+  "response": {
+    "success": false,
+    "message": "One or more validation errors occurred.",
+    "errors": {
+      "stock": ["stock cannot be negative"]
+    }
+  }
+}
+```
 
 ---
 
@@ -424,86 +543,127 @@ Content-Type: application/json
 
 | 🎯 Code | 📌 Status | 📂 Category | 💬 Meaning | 🔄 Retry |
 |---|---|---|---|---|
-| ✅ `204` | No Content | Success | Request processed successfully | ❌ No |
+| ✅ `200` | OK | Success | Request processed successfully | ❌ No |
 | ⚠️ `400` | Bad Request | Client Error | Invalid request data/validation error | ❌ No |
 | 🔐 `401` | Unauthorized | Auth Error | Invalid or missing API key | ❌ No |
 | 🔴 `500` | Server Error | Server Error | Unexpected server error | ✅ Yes |
-
-### 📋 Error Response Structures
-
-**Validation Errors (400):**
-
-```json
-{
-  "errors": {
-    "field_name": [
-      "Error message 1",
-      "Error message 2"
-    ]
-  }
-}
-
-```
-
-**Authentication Errors (401):**
-
-```json
-{
-  "error": "Invalid or missing API key"
-}
-
-```
-
-**Server Errors (500):**
-
-```json
-{
-  "error": "An unexpected error occurred while processing the request"
-}
-
-```
-
-### 💡 Response Handling Guide
-
-| 🎯 Scenario | 📌 Status | 🎯 How to Handle |
-|---|---|---|
-| 📤 Request succeeded | `204` | ✅ Success - proceed normally |
-| 🔍 Invalid data sent | `400` | ❌ Fix data, check error details, retry |
-| 🔑 Auth failed | `401` | ❌ Verify API key is correct and header name (supports X-API-Key or Secret-Key) |
-| ⚠️ Server error | `500` | ⏳ Implement exponential backoff & retry |
 
 ---
 
 ## 💻 Implementation Examples
 
+### 📝 cURL Examples
+
+**Update Product:**
+
+```bash
+curl -X POST https://connect.othoba.com/api/azan-wholesale/update-product \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key-here" \
+  -d '{
+    "product_id": "123",
+    "supplier": "Azan Wholesale",
+    "name": "Samsung 65-Inch 4K Smart TV",
+    "sku": "TV-SAMSUNG-65-2024",
+    "mrp_price": 89999.99,
+    "wholesale_price": 75000.00
+  }'
+```
+
+**Update Stock:**
+
+```bash
+curl -X POST https://connect.othoba.com/api/azan-wholesale/update-stock \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key-here" \
+  -d '{
+    "product_id": "123",
+    "sku": "TV-SAMSUNG-65-2024",
+    "supplier": "Azan Wholesale",
+    "stock": 150
+  }'
+```
+
+**Using Secret-Key Header (Alternative):**
+
+```bash
+curl -X POST https://connect.othoba.com/api/azan-wholesale/update-product \
+  -H "Content-Type: application/json" \
+  -H "Secret-Key: your-api-key-here" \
+  -d '{
+    "product_id": "123",
+    "supplier": "Azan Wholesale",
+    "name": "Samsung 65-Inch 4K Smart TV",
+    "sku": "TV-SAMSUNG-65-2024",
+    "mrp_price": 89999.99,
+    "wholesale_price": 75000.00
+  }'
+```
+
+**With Environment Variable:**
+
+```bash
+API_KEY="your-api-key-here"
+
+curl -X POST https://connect.othoba.com/api/azan-wholesale/update-product \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: $API_KEY" \
+  -d '{
+    "product_id": "123",
+    "supplier": "Azan Wholesale",
+    "name": "Samsung 65-Inch 4K Smart TV",
+    "sku": "TV-SAMSUNG-65-2024",
+    "mrp_price": 89999.99,
+    "wholesale_price": 75000.00
+  }'
+```
+
+**Pretty Print Response:**
+
+```bash
+curl -X POST https://connect.othoba.com/api/azan-wholesale/update-product \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key-here" \
+  -d '{
+    "product_id": "123",
+    "supplier": "Azan Wholesale",
+    "name": "Samsung 65-Inch 4K Smart TV",
+    "sku": "TV-SAMSUNG-65-2024",
+    "mrp_price": 89999.99,
+    "wholesale_price": 75000.00
+  }' | jq '.'
+```
+
+---
+
 ### 🐘 PHP Implementation
 
-**Basic Client:**
+**Basic Client with Typed Responses:**
 
 ```php
 <?php
 /**
  * Azan Wholesale API Client
- * @version 1.0
+ * @version 2.0
  * @author Othoba Platform
  */
 class AzanWholesaleAPI {
     private $apiKey;
     private $baseUrl = 'https://connect.othoba.com/api/azan-wholesale';
     private $timeout = 30;
-    private $headerName = 'X-API-Key'; // Can also use 'Secret-Key'
+    private $headerName = 'X-API-Key';
 
     public function __construct($apiKey, $headerName = 'X-API-Key') {
         if (empty($apiKey)) {
             throw new InvalidArgumentException('API key cannot be empty');
         }
         $this->apiKey = $apiKey;
-        $this->headerName = $headerName; // 'X-API-Key' or 'Secret-Key'
+        $this->headerName = $headerName;
     }
 
     /**
      * Update product information
-     * @return array API response
+     * @return array Response with success/error
      */
     public function updateProduct($productId, $supplier, $name, $sku, $mrpPrice, $wholesalePrice) {
         $payload = [
@@ -519,7 +679,7 @@ class AzanWholesaleAPI {
 
     /**
      * Update product stock
-     * @return array API response
+     * @return array Response with success/error
      */
     public function updateStock($productId, $sku, $supplier, $stock) {
         $payload = [
@@ -560,161 +720,335 @@ class AzanWholesaleAPI {
             return ['success' => false, 'error' => $error, 'http_code' => 0];
         }
 
-        if ($httpCode === 204) {
-            return ['success' => true, 'http_code' => 204];
+        $decoded = json_decode($response, true);
+        
+        if ($httpCode === 200) {
+            // Success response with typed ApiResponse
+            return [
+                'success' => true,
+                'http_code' => 200,
+                'data' => $decoded
+            ];
         }
 
-        $decoded = json_decode($response, true);
-        return ['success' => false, 'data' => $decoded, 'http_code' => $httpCode];
+        // Error response with ProblemDetails + nested response
+        return [
+            'success' => false,
+            'data' => $decoded,
+            'http_code' => $httpCode
+        ];
     }
 }
 
-// Usage Example with X-API-Key
+// Usage Example
 $api = new AzanWholesaleAPI($_ENV['AZAN_API_KEY'], 'X-API-Key');
-$result = $api->updateProduct('123', 'Azan', 'Samsung TV', 'TV-001', 89999.99, 75000.00);
-echo $result['success'] ? 'Success!' : 'Error: ' . json_encode($result['data']);
 
-// Or use Secret-Key header
-$api = new AzanWholesaleAPI($_ENV['AZAN_API_KEY'], 'Secret-Key');
+// Success case
 $result = $api->updateProduct('123', 'Azan', 'Samsung TV', 'TV-001', 89999.99, 75000.00);
+if ($result['success'] && $result['http_code'] === 200) {
+    echo "✅ " . $result['data']['message'];
+}
+
+// Error case
+$result = $api->updateProduct('999', 'Azan', 'TV', 'TV-001', -100, 75000.00);
+if (!$result['success']) {
+    $errors = $result['data']['response']['errors'] ?? [];
+    echo "❌ Validation errors: " . json_encode($errors);
+}
 ?>
-
 ```
 
 ---
 
-### 🐍 Python Implementation
+### 📜 JavaScript Fetch Implementation
 
-**Basic Client:**
+**Basic Client with Typed Responses:**
 
-```python
-import requests
-import json
-from typing import Dict, Any
+```javascript
+/**
+ * Azan Wholesale API Client
+ * @version 2.0
+ * @author Othoba Platform
+ */
+class AzanWholesaleAPI {
+  constructor(apiKey, headerName = 'X-API-Key', baseUrl = 'https://connect.othoba.com/api/azan-wholesale') {
+    if (!apiKey) {
+      throw new Error('API key cannot be empty');
+    }
+    this.apiKey = apiKey;
+    this.headerName = headerName;
+    this.baseUrl = baseUrl;
+    this.timeout = 30000; // 30 seconds in milliseconds
+  }
 
-class AzanWholesaleAPI:
-    """Azan Wholesale API Client"""
+  /**
+   * Update product information
+   * @returns {Promise<Object>} Response with success/error
+   */
+  async updateProduct(productId, supplier, name, sku, mrpPrice, wholesalePrice) {
+    const payload = {
+      product_id: String(productId),
+      supplier: supplier,
+      name: name,
+      sku: sku,
+      mrp_price: parseFloat(mrpPrice),
+      wholesale_price: parseFloat(wholesalePrice)
+    };
+    return this.makeRequest('/update-product', payload);
+  }
 
-    def __init__(self, api_key: str, header_name: str = "X-API-Key", 
-                 base_url: str = "https://connect.othoba.com/api/azan-wholesale"):
-        if not api_key:
-            raise ValueError("API key cannot be empty")
-        self.api_key = api_key
-        self.header_name = header_name  # 'X-API-Key' or 'Secret-Key'
-        self.base_url = base_url
-        self.timeout = 30
+  /**
+   * Update product stock
+   * @returns {Promise<Object>} Response with success/error
+   */
+  async updateStock(productId, sku, supplier, stock) {
+    const payload = {
+      product_id: String(productId),
+      sku: sku,
+      supplier: supplier,
+      stock: parseInt(stock, 10)
+    };
+    return this.makeRequest('/update-stock', payload);
+  }
 
-    def update_product(self, product_id: str, supplier: str, name: str, sku: str,
-                      mrp_price: float, wholesale_price: float) -> Dict[str, Any]:
-        """Update product information"""
-        payload = {
-            "product_id": str(product_id),
-            "supplier": supplier,
-            "name": name,
-            "sku": sku,
-            "mrp_price": mrp_price,
-            "wholesale_price": wholesale_price
-        }
-        return self._make_request('/update-product', payload)
+  /**
+   * Make HTTP request
+   * @private
+   */
+  async makeRequest(endpoint, payload) {
+    const url = `${this.baseUrl}${endpoint}`;
+    const headers = {
+      'Content-Type': 'application/json',
+      [this.headerName]: this.apiKey
+    };
 
-    def update_stock(self, product_id: str, sku: str, supplier: str, stock: int) -> Dict[str, Any]:
-        """Update product stock"""
-        payload = {
-            "product_id": str(product_id),
-            "sku": sku,
-            "supplier": supplier,
-            "stock": stock
-        }
-        return self._make_request('/update-stock', payload)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    def _make_request(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Make HTTP request"""
-        url = f"{self.base_url}{endpoint}"
-        headers = {
-            "Content-Type": "application/json",
-            self.header_name: self.api_key
-        }
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
 
-        try:
-            response = requests.post(url, headers=headers, json=payload, timeout=self.timeout)
-            if response.status_code == 204:
-                return {"success": True}
-            return {"success": False, "errors": response.json(), "http_code": response.status_code}
-        except requests.RequestException as e:
-            return {"success": False, "error": str(e)}
+      clearTimeout(timeoutId);
 
-# Usage with X-API-Key
-api = AzanWholesaleAPI(api_key="your-api-key", header_name="X-API-Key")
-result = api.update_product("123", "Azan", "Samsung TV", "TV-001", 89999.99, 75000.00)
-print("Success!" if result['success'] else f"Error: {result}")
+      const data = await response.json();
 
-# Or use Secret-Key header
-api = AzanWholesaleAPI(api_key="your-api-key", header_name="Secret-Key")
-result = api.update_product("123", "Azan", "Samsung TV", "TV-001", 89999.99, 75000.00)
+      if (response.status === 200) {
+        // Success response with typed ApiResponse
+        return {
+          success: true,
+          httpCode: 200,
+          data: data
+        };
+      }
 
+      // Error response with ProblemDetails + nested response
+      return {
+        success: false,
+        httpCode: response.status,
+        data: data
+      };
+
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error.name === 'AbortError') {
+        return {
+          success: false,
+          httpCode: 0,
+          error: 'Request timeout (30 seconds)'
+        };
+      }
+
+      return {
+        success: false,
+        httpCode: 0,
+        error: error.message || 'Network error'
+      };
+    }
+  }
+}
+
+// Usage Example
+(async () => {
+  const api = new AzanWholesaleAPI(
+    process.env.AZAN_API_KEY,
+    'X-API-Key'
+  );
+
+  // Success case
+  let result = await api.updateProduct(
+    '123',
+    'Azan',
+    'Samsung TV',
+    'TV-001',
+    89999.99,
+    75000.00
+  );
+
+  if (result.success && result.httpCode === 200) {
+    console.log('✅', result.data.message);
+  }
+
+  // Error case
+  result = await api.updateProduct(
+    '999',
+    'Azan',
+    'TV',
+    'TV-001',
+    -100,
+    75000.00
+  );
+
+  if (!result.success) {
+    const errors = result.data?.response?.errors || {};
+    console.error('❌ Validation errors:', JSON.stringify(errors, null, 2));
+  }
+})();
+```
+
+**Usage in Browser Environment:**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Azan Wholesale API Client</title>
+  <script src="azan-api-client.js"></script>
+</head>
+<body>
+  <button id="updateBtn">Update Product</button>
+
+  <script>
+    const api = new AzanWholesaleAPI(
+      'your-api-key-here',
+      'X-API-Key'
+    );
+
+    document.getElementById('updateBtn').addEventListener('click', async () => {
+      const result = await api.updateProduct(
+        '123',
+        'Azan Wholesale',
+        'Samsung 65-Inch 4K Smart TV',
+        'TV-SAMSUNG-65-2024',
+        89999.99,
+        75000.00
+      );
+
+      if (result.success && result.httpCode === 200) {
+        alert('✅ ' + result.data.message);
+      } else {
+        const errors = result.data?.response?.errors || {};
+        alert('❌ Error: ' + JSON.stringify(errors));
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+**Retry with Exponential Backoff:**
+
+```javascript
+/**
+ * Retry helper with exponential backoff
+ */
+class RetryableAzanAPI extends AzanWholesaleAPI {
+  async updateProductWithRetry(productId, supplier, name, sku, mrpPrice, wholesalePrice, maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      const result = await this.updateProduct(productId, supplier, name, sku, mrpPrice, wholesalePrice);
+
+      // Success or client error (no retry needed)
+      if (result.success || result.httpCode === 400 || result.httpCode === 401) {
+        return result;
+      }
+
+      // Server error - retry with exponential backoff
+      if (result.httpCode === 500 && attempt < maxRetries) {
+        const backoffMs = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
+        console.log(`🔄 Retry attempt ${attempt}/${maxRetries} after ${backoffMs}ms`);
+        await new Promise(resolve => setTimeout(resolve, backoffMs));
+        continue;
+      }
+
+      return result;
+    }
+  }
+}
+
+// Usage with retry
+(async () => {
+  const api = new RetryableAzanAPI(process.env.AZAN_API_KEY);
+  const result = await api.updateProductWithRetry(
+    '123',
+    'Azan',
+    'Samsung TV',
+    'TV-001',
+    89999.99,
+    75000.00
+  );
+
+  if (result.success) {
+    console.log('✅ Success:', result.data.message);
+  } else {
+    console.error('❌ Failed after retries:', result.data);
+  }
+})();
 ```
 
 ---
 
 ## ⚠️ Error Handling
 
-### Common Error Scenarios
-
-**Scenario 1️⃣ : Invalid Product ID**
-
-```json
-Request:  { "product_id": "999", ... }
-Response: { "errors": { "product_id": ["product_id must exist in system"] } }
-Status:   400 Bad Request
-
-```
-
-**Scenario 2️⃣ : Negative Price**
-
-```json
-Request:  { "mrp_price": -100, ... }
-Response: { "errors": { "mrp_price": ["mrp_price cannot be negative"] } }
-Status:   400 Bad Request
-
-```
-
-**Scenario 3️⃣ : Missing API Key**
-
-```
-Request:  (no X-API-Key or Secret-Key header)
-Response: { "error": "Invalid or missing API key" }
-Status:   401 Unauthorized
-
-```
-
-**Scenario 4️⃣ : Server Error**
-
-```json
-Response: { "error": "An unexpected error occurred while processing the request" }
-Status:   500 Internal Server Error
-Action:   Retry with exponential backoff (1s, 2s, 4s)
-
-```
-
-### 🛠️ Client-Side Error Handling Best Practices
-
+### Client-Side Best Practices
 
 ```javascript
-// Pseudo-code pattern
-if (response.status === 204) {
-  // ✅ Success
-  console.log('Request processed successfully');
-} else if (response.status === 400) {
-  // ⚠️ Validation error - don't retry
-  console.error('Invalid data:', response.errors);
-} else if (response.status === 401) {
-  // 🔐 Auth error - check API key and header name
-  console.error('Invalid API key or header. Supported headers: X-API-Key, Secret-Key');
-} else if (response.status === 500) {
-  // 🔴 Server error - retry with backoff
-  retryWithExponentialBackoff();
-}
+async function updateProduct(data) {
+  try {
+    const response = await fetch('https://connect.othoba.com/api/azan-wholesale/update-product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': process.env.AZAN_API_KEY
+      },
+      body: JSON.stringify(data)
+    });
 
+    const json = await response.json();
+
+    if (response.status === 200) {
+      // ✅ Success - check typed ApiResponse
+      console.log('✅ Success:', json.message);
+      return json;
+    } 
+    
+    if (response.status === 400) {
+      // ⚠️ Validation error - check nested response
+      const errors = json.response?.errors || {};
+      console.error('❌ Validation failed:', errors);
+      return null;
+    } 
+    
+    if (response.status === 401) {
+      // 🔐 Auth error
+      console.error('🔐 Auth failed:', json.response?.message);
+      return null;
+    } 
+    
+    if (response.status === 500) {
+      // 🔴 Server error - retry with backoff
+      console.error('🔴 Server error:', json.response?.message);
+      return retryWithBackoff(data);
+    }
+    
+  } catch (error) {
+    console.error('Network error:', error);
+  }
+}
 ```
 
 ---
@@ -728,7 +1062,6 @@ if (response.status === 204) {
 | 📈 **Hourly Limit** | 10,000 requests/hour | Plan accordingly |
 | ⏱️ **Recommended Delay** | 100-200ms between requests | Avoid bursts |
 | 🚀 **Max Burst Rate** | 5 requests/second | Short burst allowed |
-| 💾 **Batch Size** | 50-100 items | Optimize performance |
 
 ### 📈 Performance Metrics
 
@@ -738,21 +1071,6 @@ if (response.status === 204) {
 | 📈 **P95 Response** | 500ms | 95th percentile |
 | 📊 **P99 Response** | 1000ms | 99th percentile |
 | 🌐 **Availability** | 99.9% | SLA guaranteed |
-
-### 💡 Optimization Tips
-
-✅ **Do:**
-- Use batch operations when possible
-- Implement exponential backoff for retries
-- Cache responses where appropriate
-- Monitor API usage patterns
-- Support both X-API-Key and Secret-Key headers in client implementations
-
-❌ **Don't:**
-- Make synchronous sequential calls
-- Send duplicate requests
-- Bypass rate limiting
-- Store API keys in code
 
 ---
 
@@ -765,54 +1083,39 @@ if (response.status === 204) {
 | 📧 **Email** | support@othoba.com | 24/7 Support |
 | 💬 **Documentation** | See this guide | Always available |
 
-### 📚 Additional Resources
-
-- 📖 **This API Reference** - Complete technical documentation
-- 🧪 **Testing Guide** - Validation testing procedures
-- 💻 **Code Examples** - PHP & Python implementations
-- 🔧 **Implementation Guide** - Step-by-step integration
-
----
-
-## 🎓 Quick Start Checklist
-
-Before going live:
-
-- [ ] 🔑 Obtain API key from Othoba
-- [ ] 📝 Review authentication requirements
-- [ ] 💾 Store API key in environment variables
-- [ ] 🧪 Test endpoints in development environment
-- [ ] 📊 Implement error handling & retry logic
-- [ ] ⚡ Set up rate limiting (100-200ms between requests)
-- [ ] 📋 Validate request payloads
-- [ ] 🔍 Test all error scenarios
-- [ ] 📈 Monitor API usage in production
-- [ ] 🆘 Configure alerting for failures
-
 ---
 
 ## 🙋 FAQ
 
-**Q: How do I get an API key?**  
-A: Contact support@othoba.com to request an API key.
+**Q: What's the response format for successful requests?**  
+A: HTTP 200 with a strongly-typed `ApiResponse` object containing `success: true`, `message`, and `errors: null` fields.
 
-**Q: Can I use HTTP instead of HTTPS?**  
-A: No, HTTPS/TLS 1.2+ is mandatory for security.
+**Q: How are errors returned?**  
+A: Errors use RFC 7807 `ProblemDetails` format with a nested `response` field containing the `ApiResponse` object with error details, error types, and HTTP status codes.
 
-**Q: What's the request timeout?**  
-A: 30 seconds per request.
+**Q: Which header should I use - X-API-Key or Secret-Key?**  
+A: Both are fully supported! The API checks `X-API-Key` first, then `Secret-Key` if not found. Use whichever is more appropriate for your integration.
 
-**Q: Can I batch multiple updates?**  
-A: Yes, implement client-side batching with 100-200ms delays between requests.
+**Q: Can I switch between header names?**  
+A: Yes, both headers are always supported simultaneously without any code changes needed.
 
 **Q: What happens if I exceed the rate limit?**  
-A: Requests will be rejected. Implement exponential backoff retry strategy.
+A: Requests will be rejected with HTTP 429. Implement exponential backoff retry strategy (1s, 2s, 4s).
 
-**Q: Which header should I use for API key - X-API-Key or Secret-Key?**  
-A: Both are supported! The API checks `X-API-Key` first, then falls back to `Secret-Key` if not found. Use whichever is more appropriate for your integration.
+**Q: How do I handle validation errors in my client?**  
+A: Parse the `response.errors` field from the `ProblemDetails`. It contains field-level errors as arrays of strings grouped by field name.
 
-**Q: Do I need to change my implementation if I want to switch between header names?**  
-A: No, both headers are always supported simultaneously. You can use either one, or even migrate from one to the other without service disruption.
+**Q: Is there a SDK available?**  
+A: SDK examples are provided for PHP and JavaScript. Both follow the same error handling and response patterns.
+
+**Q: How do I log API requests safely?**  
+A: Never log complete API keys. Mask all but the last 4 characters. Example: `sk_live_****789jkl`
+
+**Q: What's the timeout for API requests?**  
+A: 30 seconds per request. Implement client-side timeouts to match this limit.
+
+**Q: Can I batch multiple updates?**  
+A: No, each request must be a single product or stock update. Implement client-side batching with 100-200ms delays between requests.
 
 ---
 
@@ -820,17 +1123,19 @@ A: No, both headers are always supported simultaneously. You can use either one,
 
 | 🏷️ Property | 📝 Value |
 |---|---|
-| **Version** | 1.1 |
+| **Version** | 2.1 |
 | **Last Updated** | January 2024 |
-| **Status** | Production Ready |
-| **Framework** | ASP.NET Core 6 |
-| **Language** | C# 10 |
+| **Status** | ✅ Production Ready |
+| **Framework** | ASP.NET Core 6 (.NET 6) |
+| **Response Model** | Typed ApiResponse + RFC 7807 ProblemDetails |
+| **Architecture** | RESTful, Stateless, Async/Await |
+| **SDK Examples** | PHP, JavaScript (Fetch) |
 | **License** | Proprietary |
 
 ---
 
-> 💡 **Pro Tip:** Keep this documentation handy during integration. Refer to specific sections when debugging API issues.
+> 💡 **Pro Tip:** This documentation reflects the production implementation. All responses are strongly-typed and follow industry best practices (RFC 7807 ProblemDetails, async/await patterns, comprehensive error handling).
 
 ---
 
-**© 2024 Othoba Platform. All rights reserved.**
+**© 2026 Othoba Platform. All rights reserved. Confidential.**
